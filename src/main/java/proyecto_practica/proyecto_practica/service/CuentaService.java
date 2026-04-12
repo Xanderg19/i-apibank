@@ -1,13 +1,13 @@
 package proyecto_practica.proyecto_practica.service;
 
-import jakarta.validation.Valid;
-import lombok.Getter;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.server.ResponseStatusException;
 import proyecto_practica.proyecto_practica.model.*;
 import proyecto_practica.proyecto_practica.repository.CuentaRepository;
@@ -15,16 +15,23 @@ import proyecto_practica.proyecto_practica.repository.TransaccionRepository;
 import proyecto_practica.proyecto_practica.repository.UsuarioRepository;
 import proyecto_practica.proyecto_practica.utils.TipoTransaccion;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class CuentaService {
 
     private final CuentaRepository cuentaRepository;
     private final UsuarioRepository usuarioRepository;
     private  final TransaccionRepository transaccionRepository;
+
+    public CuentaService(CuentaRepository cuentaRepository, UsuarioRepository usuarioRepository, TransaccionRepository transaccionRepository) {
+        this.cuentaRepository = cuentaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.transaccionRepository = transaccionRepository;
+    }
 
 
     public Cuenta registrarCuenta(Integer id, Cuenta cuenta) {
@@ -156,6 +163,71 @@ public class CuentaService {
     }
 
 
+    public List<Transaccion> historialTransacciones(Integer id, LocalDate fechaInicio, LocalDate fechaFin, TipoTransaccion tipoTransaccion) {
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .orElseThrow(()->
+                        new RuntimeException("Cuenta no encontrada"));
+        LocalDateTime inicio = (fechaInicio != null)
+                ? fechaInicio.atStartOfDay()
+                : LocalDateTime.of(2000, 1, 1, 0, 0);
+
+        LocalDateTime fin = (fechaFin != null)
+                ? fechaFin.plusDays(1).atStartOfDay()
+                : LocalDateTime.now().plusDays(1);
+
+        return transaccionRepository.filtrarPorCuentaYTipo(id, tipoTransaccion);
+    }
+
+    public EstadoCuentaDTO estadoCuenta(Integer id) {
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Cuenta no encontrada"
+                ));
+        EstadoCuentaDTO estadoCuentaDTO = new EstadoCuentaDTO();
+
+        estadoCuentaDTO.setCuentaId(cuenta.getId());
+        estadoCuentaDTO.setSaldoActual(cuenta.getSaldo());
+
+        List<Transaccion>  transacciones = historialTransacciones(cuenta.getId(), null, null, null);
+        double totalDepositos = 0;
+        double totalRetiro= 0;
+
+        for (Transaccion transaccion : transacciones) {
+
+            if (transaccion.getTipo() == TipoTransaccion.DEPOSITO ||
+                    transaccion.getTipo() == TipoTransaccion.TRANSFERENCIA) {
+
+                totalDepositos += transaccion.getMonto();
+            }
+            if(transaccion.getTipo() == TipoTransaccion.RETIRO) {
+                totalRetiro += transaccion.getMonto();
+            }
+        }
+        estadoCuentaDTO.setTotalDepositos(BigDecimal.valueOf(totalDepositos));
+        estadoCuentaDTO.setTotalRetiros(BigDecimal.valueOf( totalRetiro));
+        estadoCuentaDTO.setNumeroTransacciones(transacciones.size());
+        Pageable pageable = PageRequest.of(0, 2);
+
+        List<Transaccion> ultimas = transaccionRepository
+                .findUltimasTransacciones(cuenta.getId(), pageable);
+
+        List<TransaccionResumenDTO> ultimosMovimientos = ultimas.stream()
+                .map(t -> new TransaccionResumenDTO(
+                        t.getTipo().name(),
+                        BigDecimal.valueOf(t.getMonto()),
+                        t.getFecha().toLocalDate()
+                ))
+                .toList();
+
+        estadoCuentaDTO.setUltimosMovimientos(ultimosMovimientos);
+
+        return estadoCuentaDTO;
 
 
-}
+
+
+
+        }
+
+    }
+

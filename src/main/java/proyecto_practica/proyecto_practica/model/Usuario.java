@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,4 +23,28 @@ public class Usuario {
     @Email(message = "Correo invalido")
     @NotBlank(message = "Correo es obligatorio")
     private String correo;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
 }

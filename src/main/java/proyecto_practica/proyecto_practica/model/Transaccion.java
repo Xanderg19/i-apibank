@@ -3,7 +3,6 @@ package proyecto_practica.proyecto_practica.model;
 import jakarta.persistence.*;
 import proyecto_practica.proyecto_practica.utils.TipoTransaccion;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

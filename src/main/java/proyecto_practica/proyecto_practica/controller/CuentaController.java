@@ -4,18 +4,22 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import proyecto_practica.proyecto_practica.model.Cuenta;
-import proyecto_practica.proyecto_practica.model.RequestDepositar;
-import proyecto_practica.proyecto_practica.model.TransferenciasDTO;
+import proyecto_practica.proyecto_practica.model.*;
 import proyecto_practica.proyecto_practica.service.CuentaService;
+import proyecto_practica.proyecto_practica.utils.TipoTransaccion;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/cuenta")
-@RequiredArgsConstructor
 public class CuentaController {
 
     private final CuentaService cuentaService;
 
+    public CuentaController(CuentaService cuentaService) {
+        this.cuentaService = cuentaService;
+    }
 
 
     @PostMapping("/usuario/{id}")
@@ -39,6 +43,22 @@ public class CuentaController {
     public TransferenciasDTO transferirCuenta(@Valid @RequestBody TransferenciasDTO transferenciasDTO) {
 
         return cuentaService.tranferirCuenta(transferenciasDTO);
+    }
+
+
+    @GetMapping("historial-transacciones/{id}")
+    public List<Transaccion> historialTransacciones(
+            @PathVariable("id") Integer id,
+            @RequestParam(required = false) LocalDate fechaInicio,
+            @RequestParam(required = false) LocalDate fechaFin,
+            @RequestParam(required = false) TipoTransaccion tipoTransaccion
+    ) {
+        return cuentaService.historialTransacciones(id, fechaInicio, fechaFin, tipoTransaccion);
+    }
+
+    @GetMapping("id/{id}/estado")
+    public EstadoCuentaDTO estadoCuenta(@PathVariable("id") Integer id) {
+        return cuentaService.estadoCuenta(id);
     }
 
 
