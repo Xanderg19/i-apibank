@@ -43,4 +43,4 @@ jobs:
         docker push xanderg19/my-api:$TAG 
     - name: Push Docker Image
       run: 
-        docker push xanderg19/my-api  
+        docker push xanderg19/my-api:latest
