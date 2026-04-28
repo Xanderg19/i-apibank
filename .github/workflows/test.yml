@@ -40,4 +40,7 @@ jobs:
           docker build -t xanderg19/my-api:$TAG .
     - name: Push Docker Image
       run: 
-        docker push xanderg19/my-api:$TAG        
+        docker push xanderg19/my-api:$TAG 
+    - name: Push Docker Image
+      run: 
+        docker push xanderg19/my-api  
