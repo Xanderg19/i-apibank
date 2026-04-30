@@ -36,9 +36,9 @@ jobs:
       run: 
           echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
     - name: Build Docker Image (TAG)
-      run: 
+      run: |
           docker build -t xanderg19/my-api:$TAG .
-          docker tag xanderg19/my-api:$TAG xanderg19/my-api:latest
+          docker tag xanderg19/my-api:$TAG xanderg19/my-api:latest 
 
     - name: Push Docker Images
       if: github.ref == 'refs/heads/main'
