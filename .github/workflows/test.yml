@@ -35,12 +35,13 @@ jobs:
     - name: Set tag
       run: 
           echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
-    - name: Build Docker Image
-      run: 
-          docker build -t xanderg19/my-api:$TAG .
+    - name: Push Docker Image (TAG)
+      if: github.ref == 'refs/heads/main'
+      run: docker push xanderg19/my-api:$TAG
+
+    - name: Push Docker Image (LATEST)
+      if: github.ref == 'refs/heads/main'
+      run: docker push xanderg19/my-api:latest
     - name: Push Docker Image
-      run: 
-        docker push xanderg19/my-api:$TAG 
-    - name: Push Docker Image
-      run: 
-        docker push xanderg19/my-api:latest
+      if: github.ref == 'refs/heads/main'
+      run: docker push xanderg19/my-api:latest
