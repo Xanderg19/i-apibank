@@ -61,3 +61,11 @@ jobs:
       run: |
         docker push xanderg19/my-api:$TAG
         docker push xanderg19/my-api:latest
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Mostrar rama
+          run: echo "Estoy en la rama $GITHUB_REF"
+
+        - name: Test aprendiendo
+          run: echo "pipeline funcionando"
