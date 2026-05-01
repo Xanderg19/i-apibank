@@ -54,10 +54,6 @@ jobs:
       run: |
           docker build -t xanderg19/my-api:$TAG .
           docker tag xanderg19/my-api:$TAG xanderg19/my-api:latest
-  docker-job:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
     - name: Push Docker Images
       if: github.ref == 'refs/heads/main'
       run: |
@@ -65,10 +61,13 @@ jobs:
         docker push xanderg19/my-api:latest
   test-job:
     runs-on: ubuntu-latest
-    needs: docker-job
+    needs: build
     steps:
-        - name: Mostrar rama
-          run: echo "Estoy en la rama $GITHUB_REF"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Test aprendiendo
-          run: echo "pipeline funcionando"
+      - name: Mostrar rama
+        run: echo "Estoy en la rama $GITHUB_REF"
+
+      - name: Test aprendiendo
+        run: echo "pipeline funcionando"
