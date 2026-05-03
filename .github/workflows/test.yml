@@ -46,7 +46,7 @@ jobs:
           maven-${{ runner.os }}-
 
     - name: Build Java
-      run: mvn clean installadsd -Dspring.profiles.active=test
+      run: mvn clean install -Dspring.profiles.active=test
     - name: Debug DB
       run: docker ps
 
@@ -64,7 +64,7 @@ jobs:
           docker build -t xanderg19/my-api:$TAG .
           docker tag xanderg19/my-api:$TAG xanderg19/my-api:latest
     - name: Push Docker Images
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/feature'
       run: |
         docker push xanderg19/my-api:$TAG
         docker push xanderg19/my-api:latest
