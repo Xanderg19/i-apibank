@@ -64,6 +64,7 @@ jobs:
             username: ${{ secrets.DOCKER_USER }}
             password: ${{ secrets.DOCKER_PASSWORD }}
 
+
         - name: Set tag
           run:
               echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
