@@ -64,7 +64,7 @@ jobs:
           docker build -t xanderg19/my-api:$TAG .
           docker tag xanderg19/my-api:$TAG xanderg19/my-api:latest
     - name: Push Docker Images
-      if: github.ref == 'feature'
+      if: github.ref == 'refs/heads/feature'
       run: |
         docker push xanderg19/my-api:$TAG
         docker push xanderg19/my-api:latest
